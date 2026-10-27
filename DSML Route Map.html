@@ -1,0 +1,744 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>DSML Route Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout concept: a transit route map. The 7 modules are stations on one line that ends at the capstone terminus. */
+:root{
+  --paper:#F2F4F1; --panel:#FFFFFF; --ink:#14201B; --muted:#56635D; --rule:#D3DAD5; --soft:#E6EBE7;
+  --accent:#0B7A63; --signal:#D98A1E; --danger:#C23B4E;
+  --m1:#2E66D0; --m2:#7C4BCB; --m3:#0B7A63; --m4:#C9731B; --m5:#C23B4E; --m6:#13879A; --m7:#14201B;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0E1412; --panel:#151D1A; --ink:#E4ECE8; --muted:#97A59F; --rule:#2A3632; --soft:#1C2622;
+  --accent:#3CC6A2; --signal:#F0AE4A; --danger:#F07085;
+  --m1:#6E9BF0; --m2:#AE87F0; --m3:#3CC6A2; --m4:#F0A04F; --m5:#F07085; --m6:#4CC3D6; --m7:#E4ECE8;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1412; --panel:#151D1A; --ink:#E4ECE8; --muted:#97A59F; --rule:#2A3632; --soft:#1C2622;
+  --accent:#3CC6A2; --signal:#F0AE4A; --danger:#F07085;
+  --m1:#6E9BF0; --m2:#AE87F0; --m3:#3CC6A2; --m4:#F0A04F; --m5:#F07085; --m6:#4CC3D6; --m7:#E4ECE8;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.08;margin:0}
+h2{font-size:clamp(30px,4.4vw,48px);font-weight:800;letter-spacing:-.02em}
+h3{font-size:22px;font-weight:700}
+p{margin:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{max-width:62ch;color:var(--muted);font-size:18px}
+section{padding-block:72px;border-top:1px solid var(--rule)}
+.sec-head{display:grid;gap:12px;margin-bottom:36px}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px;border-radius:6px}
+
+/* nav */
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+nav.top .wrap{display:flex;align-items:center;gap:18px;height:56px;overflow-x:auto;scrollbar-width:none}
+nav.top .brand{font-family:var(--display);font-weight:800;font-size:18px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--paper),0 0 0 5px var(--accent)}
+nav.top .links{display:flex;gap:4px;margin-left:auto}
+nav.top .links a{color:var(--muted);text-decoration:none;font-size:14px;padding:6px 10px;border-radius:99px;white-space:nowrap}
+nav.top .links a:hover{background:var(--soft);color:var(--ink)}
+
+/* hero */
+.hero{padding-block:56px 64px;border-top:none}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:44px;align-items:center}
+.hero h1{font-size:clamp(40px,6.4vw,76px);font-weight:800;letter-spacing:-.035em}
+.hero h1 .hl{color:var(--accent);position:relative;white-space:nowrap}
+.hero h1 .hl::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.12em;background:var(--signal);transform-origin:left;animation:underline 1.1s .4s cubic-bezier(.6,0,.2,1) both;border-radius:3px;opacity:.85}
+@keyframes underline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hero .lede{margin-top:20px}
+.stats{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:30px}
+.stat b{display:block;font-family:var(--display);font-size:36px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:14px;color:var(--muted)}
+.machine{background:var(--panel);border:1px solid var(--rule);border-radius:20px;padding:14px;position:relative;min-width:0}
+.machine canvas{display:block;width:100%;height:320px}
+.machine .cap{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted);padding:6px 6px 0}
+
+/* loop */
+.loop{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:step}
+.step{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:var(--r);padding:22px 20px 20px;display:grid;gap:8px;align-content:start;animation:stepglow 15s infinite;animation-delay:calc(var(--i) * 2.5s)}
+@keyframes stepglow{0%,14%{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}17%,100%{border-color:var(--rule);box-shadow:none}}
+.step .n{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:600}
+.step p{color:var(--muted);font-size:15.5px}
+.step .ex{font-size:14px;background:var(--soft);border-radius:8px;padding:8px 10px;color:var(--ink)}
+.step .mods{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.mchip{font-family:var(--mono);font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:99px;color:var(--panel);background:var(--c)}
+.loop-note{margin-top:18px;color:var(--muted);font-size:15px;display:flex;gap:10px;align-items:center}
+.loop-note svg{flex:none}
+
+/* kinds */
+.kinds{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.kind{border:1px solid var(--rule);border-radius:var(--r);padding:20px;display:grid;gap:10px;background:var(--panel)}
+.kind svg{width:100%;height:130px;display:block}
+.kind p{color:var(--muted);font-size:15.5px}
+
+/* route map */
+.route-scroll{overflow-x:auto;padding-bottom:8px;margin-inline:-4px}
+.route{position:relative;display:grid;grid-template-columns:repeat(7,minmax(118px,1fr));gap:0;min-width:820px;padding:8px 4px 0}
+.route .track{position:absolute;left:calc(100%/14);right:calc(100%/14);top:36px;height:8px;border-radius:8px;background:linear-gradient(90deg,var(--m1),var(--m2),var(--m3),var(--m4),var(--m5),var(--m6),var(--m7))}
+.route .track::after{content:"";position:absolute;inset:2px 0;background:repeating-linear-gradient(90deg,var(--paper) 0 6px,transparent 6px 22px);opacity:.55;animation:flow 1.4s linear infinite}
+@keyframes flow{from{background-position:0 0}to{background-position:22px 0}}
+.stop{position:relative;display:grid;justify-items:center;gap:8px;background:none;border:0;padding:0 6px 14px;cursor:pointer;color:var(--ink);font:inherit;text-align:center}
+.stop .ring{width:48px;height:48px;border-radius:50%;background:var(--panel);border:5px solid var(--c);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:18px;transition:transform .25s,background .25s,color .25s;margin-top:16px}
+.stop.end .ring{border-radius:12px;width:54px}
+.stop:hover .ring{transform:scale(1.08)}
+.stop[aria-selected="true"] .ring{background:var(--c);color:var(--paper);transform:scale(1.14)}
+.stop .t{font-family:var(--display);font-weight:700;font-size:15px;line-height:1.2;max-width:15ch}
+.stop .h{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.stop[aria-selected="true"] .t{color:var(--c)}
+
+.detail{margin-top:22px;background:var(--panel);border:1px solid var(--rule);border-top:6px solid var(--c);border-radius:var(--r);padding:28px;display:grid;grid-template-columns:1.25fr 1fr;gap:32px;animation:pop .4s ease}
+@keyframes pop{from{transform:translateY(8px)}to{transform:none}}
+.detail > div{min-width:0;display:grid;gap:18px;align-content:start}
+.detail .simple{font-size:19px;line-height:1.5}
+.detail h4{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:600}
+.topics{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.topics li{display:grid;grid-template-columns:minmax(0,1fr);padding:9px 0;border-bottom:1px dashed var(--rule)}
+.topics li:last-child{border-bottom:0}
+.topics b{font-weight:700}
+.topics span{color:var(--muted);font-size:15px}
+.labs{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.labs li{display:flex;gap:10px;align-items:baseline;font-size:15.5px}
+.labs li::before{content:"";flex:none;width:8px;height:8px;border-radius:2px;background:var(--c);transform:translateY(-1px)}
+.mini{background:color-mix(in srgb,var(--c) 10%,var(--panel));border:1px solid color-mix(in srgb,var(--c) 35%,var(--rule));border-radius:12px;padding:16px}
+.mini .tag{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--c);letter-spacing:.06em;text-transform:uppercase}
+.mini p{margin-top:6px;font-size:15.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--mono);font-size:12.5px;padding:4px 10px;border-radius:99px;border:1px solid var(--rule);background:var(--paper)}
+.hours{display:grid;gap:6px}
+.hours .bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden}
+.hours .bar i{display:block;height:100%;background:var(--c);border-radius:99px;animation:grow .7s ease both}
+@keyframes grow{from{transform:scaleX(.05);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+.hours small{font-family:var(--mono);color:var(--muted);font-size:12px}
+.why{font-size:15px;color:var(--muted);border-left:3px solid var(--c);padding-left:12px}
+
+/* capstone */
+.cap-hero{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;margin-bottom:34px}
+.badge{font-family:var(--mono);font-size:13px;border:1.5px solid var(--ink);border-radius:99px;padding:6px 14px;white-space:nowrap}
+.arch{background:var(--panel);border:1px solid var(--rule);border-radius:20px;padding:18px}
+.arch-scroll{overflow-x:auto}
+.arch svg{display:block;min-width:720px;width:100%;height:auto}
+.arch text{font-family:var(--body);fill:var(--ink)}
+.arch .lbl{font-size:15px;font-weight:700}
+.arch .sub{font-size:12px;fill:var(--muted);font-family:var(--mono)}
+.arch .box{fill:var(--paper);stroke:var(--rule);stroke-width:1.5}
+.arch .box.hot{stroke:var(--accent);stroke-width:2}
+.arch .ec2{fill:none;stroke:var(--signal);stroke-width:1.5;stroke-dasharray:6 6}
+.arch .ec2t{font-family:var(--mono);font-size:12px;fill:var(--signal);font-weight:600}
+.arch .wire{fill:none;stroke:var(--muted);stroke-width:1.6}
+.arch .wire.dash{stroke-dasharray:4 5}
+.arch .pkt{fill:var(--signal)}
+.arch .pkt2{fill:var(--accent)}
+.arch-key{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:10px;font-size:14px;color:var(--muted)}
+.arch-key span{display:inline-flex;align-items:center;gap:8px}
+.arch-key i{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+.phases{display:grid;gap:0;margin-top:48px;position:relative}
+.phase{display:grid;grid-template-columns:64px minmax(0,1fr);gap:18px;position:relative;padding-bottom:30px}
+.phase::before{content:"";position:absolute;left:31px;top:58px;bottom:0;width:2px;background:repeating-linear-gradient(var(--rule) 0 6px,transparent 6px 12px)}
+.phase:last-child::before{display:none}
+.phase .num{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:24px;background:var(--panel);border:2px solid var(--ink)}
+.phase .body{background:var(--panel);border:1px solid var(--rule);border-radius:var(--r);padding:22px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px}
+.phase .body > div{min-width:0;display:grid;gap:12px;align-content:start}
+.phase .body p.s{color:var(--muted);font-size:15.5px}
+.phase ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:15.5px}
+.out{background:var(--soft);border-radius:10px;padding:14px;font-size:15px;display:grid;gap:6px}
+.out b{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.uses{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+
+/* lab: try it */
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:var(--r);padding:22px;display:grid;gap:16px;align-content:start;min-width:0}
+.field{display:grid;gap:6px}
+.field label{font-weight:700;font-size:15px;display:flex;justify-content:space-between;gap:12px}
+.field label output{font-family:var(--mono);font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:inherit;font-size:14px;padding:7px 12px;border-radius:99px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.gauge{display:grid;gap:8px}
+.gauge .big{font-family:var(--display);font-size:56px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.gauge .meter{height:14px;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--signal),var(--danger));position:relative}
+.gauge .meter i{position:absolute;top:-5px;width:4px;height:24px;border-radius:3px;background:var(--ink);transition:left .35s cubic-bezier(.3,.7,.3,1);transform:translateX(-2px)}
+.pill{display:inline-block;font-family:var(--mono);font-size:12.5px;font-weight:600;padding:4px 10px;border-radius:99px;color:var(--paper)}
+pre.json{margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.55;background:var(--soft);border-radius:10px;padding:14px;overflow-x:auto;color:var(--ink)}
+pre.json .k{color:var(--m1)} pre.json .v{color:var(--m4)} pre.json .c{color:var(--muted)}
+.note{font-size:13.5px;color:var(--muted)}
+
+.cm-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:20px}
+.dots{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;max-width:340px}
+.dots i{aspect-ratio:1;border-radius:50%;transition:background .3s,border-color .3s;border:2px solid transparent;max-width:100%}
+.dots i.tp{background:var(--danger)} .dots i.fn{background:transparent;border-color:var(--danger)}
+.dots i.fp{background:var(--signal)} .dots i.tn{background:var(--soft);border-color:var(--rule)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:50%;display:inline-block;border:2px solid transparent}
+.cm{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px;font-size:14px;font-variant-numeric:tabular-nums}
+.cm div{padding:10px;border-radius:8px;background:var(--soft);text-align:center}
+.cm .hd{background:none;font-family:var(--mono);font-size:11.5px;color:var(--muted);padding:4px}
+.cm b{display:block;font-family:var(--display);font-size:24px}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.metric{border:1px solid var(--rule);border-radius:10px;padding:12px;display:grid;gap:2px}
+.metric b{font-family:var(--display);font-size:26px;font-variant-numeric:tabular-nums}
+.metric span{font-size:13.5px;color:var(--muted)}
+.metric em{font-style:normal;font-family:var(--mono);font-size:12px;font-weight:600}
+
+/* models */
+.models{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:20px}
+.model{border:1px solid var(--rule);border-radius:12px;padding:16px;background:var(--panel);display:grid;gap:6px;align-content:start}
+.model b{font-family:var(--display);font-size:17px}
+.model span{font-size:14.5px;color:var(--muted)}
+
+/* deliverables */
+.deliv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.deliv label{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .2s,background .2s}
+.deliv input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin-top:2px}
+.deliv label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--panel))}
+.deliv label:has(input:checked) .dt{text-decoration:line-through;text-decoration-color:var(--accent)}
+.deliv .dt{font-weight:700}
+.deliv .dd{display:block;font-size:14px;color:var(--muted)}
+.progress{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.progress .bar{flex:1;height:10px;border-radius:99px;background:var(--soft);overflow:hidden}
+.progress .bar i{display:block;height:100%;background:var(--accent);transition:width .4s}
+.progress span{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* stack */
+.stack{display:grid;gap:10px}
+.srow{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--rule)}
+.srow .who{display:flex;gap:10px;align-items:center;font-weight:700;font-size:15px}
+.srow .who i{width:14px;height:14px;border-radius:50%;background:var(--c);flex:none}
+
+footer{border-top:1px solid var(--rule);padding-block:36px 48px;color:var(--muted);font-size:14px}
+
+/* gentle entrance: transform only, content always visible */
+.rise{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{transform:translateY(14px)}to{transform:none}}
+@supports (animation-timeline: view()){
+  .reveal{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 60%}
+}
+
+@media (max-width:900px){
+  .hero-grid,.detail,.lab,.cm-wrap,.phase .body{grid-template-columns:minmax(0,1fr)}
+  .loop,.kinds{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .models{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cap-hero{grid-template-columns:minmax(0,1fr)}
+  .badge{justify-self:start}
+}
+@media (max-width:600px){
+  body{font-size:16px}
+  section{padding-block:52px}
+  .loop,.kinds,.deliv,.models{grid-template-columns:minmax(0,1fr)}
+  .machine canvas{height:240px}
+  .detail{padding:20px}
+  .phase{grid-template-columns:44px minmax(0,1fr);gap:12px}
+  .phase .num{width:44px;height:44px;font-size:18px}
+  .phase::before{left:21px;top:44px}
+  .srow{grid-template-columns:minmax(0,1fr);gap:6px}
+  nav.top .links a.opt{display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+
+<nav class="top" aria-label="Sections">
+  <div class="wrap">
+    <div class="brand"><span class="dot" aria-hidden="true"></span>DSML Route Map</div>
+    <div class="links">
+      <a href="#how">How it works</a>
+      <a href="#route">Modules</a>
+      <a href="#capstone">Capstone</a>
+      <a href="#try" class="opt">Try it</a>
+      <a href="#finish" class="opt">Checklist</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div class="rise">
+      <div class="eyebrow">MPGI · Data Science &amp; Machine Learning</div>
+      <h1 style="margin-top:14px">Turn raw data into a <span class="hl">live app.</span></h1>
+      <p class="lede">This course takes you from your first Pandas table to a machine learning model running on a real server. Here is how the whole journey fits together, one stop at a time.</p>
+      <div class="stats">
+        <div class="stat"><b>7</b><span>modules</span></div>
+        <div class="stat"><b>6</b><span>mini projects</span></div>
+        <div class="stat"><b>1</b><span>capstone (20 hrs)</span></div>
+        <div class="stat"><b>25+</b><span>tools you will use</span></div>
+      </div>
+    </div>
+    <figure class="machine rise" style="margin:0;animation-delay:.15s" aria-label="Animation: grey data rows enter a model and leave sorted into two coloured groups">
+      <canvas id="flow"></canvas>
+      <figcaption class="cap"><span>raw rows →</span><span>model</span><span>→ predictions</span></figcaption>
+    </figure>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Part 1 · The big idea</div>
+      <h2>How data science works</h2>
+      <p class="lede">Every data science project, small or big, follows the same six steps. You will repeat this loop in all six mini projects, and then do it fully in the capstone.</p>
+    </div>
+    <div class="loop">
+      <div class="step reveal" style="--i:0"><span class="n">STEP 1</span><h3>Ask a clear question</h3><p>Start with a business problem you can answer with data.</p><div class="ex">“Which customers will cancel next month?”</div><div class="mods"><span class="mchip" style="--c:var(--m7)">Capstone</span></div></div>
+      <div class="step reveal" style="--i:1"><span class="n">STEP 2</span><h3>Collect and clean</h3><p>Load the data, fix missing values, remove duplicates and odd values.</p><div class="ex">Real data is messy. Cleaning often takes the most time.</div><div class="mods"><span class="mchip" style="--c:var(--m1)">M1</span><span class="mchip" style="--c:var(--m4)">M4</span></div></div>
+      <div class="step reveal" style="--i:2"><span class="n">STEP 3</span><h3>Explore and test</h3><p>Draw charts, look for patterns, and check if a pattern is real or just luck.</p><div class="ex">Do customers on monthly plans leave more often?</div><div class="mods"><span class="mchip" style="--c:var(--m1)">M1</span><span class="mchip" style="--c:var(--m2)">M2</span></div></div>
+      <div class="step reveal" style="--i:3"><span class="n">STEP 4</span><h3>Train a model</h3><p>Show the computer many past examples so it learns the pattern by itself.</p><div class="ex">Past customers + “left / stayed” → a model.</div><div class="mods"><span class="mchip" style="--c:var(--m3)">M3</span><span class="mchip" style="--c:var(--m4)">M4</span><span class="mchip" style="--c:var(--m5)">M5</span><span class="mchip" style="--c:var(--m6)">M6</span></div></div>
+      <div class="step reveal" style="--i:4"><span class="n">STEP 5</span><h3>Check how good it is</h3><p>Test the model on data it has never seen. Use scores like F1 and ROC-AUC.</p><div class="ex">A model is only useful if it works on new data.</div><div class="mods"><span class="mchip" style="--c:var(--m3)">M3</span></div></div>
+      <div class="step reveal" style="--i:5"><span class="n">STEP 6</span><h3>Ship and watch</h3><p>Put the model inside an app on a server. Keep track of versions and results.</p><div class="ex">Anyone with the link can now get a prediction.</div><div class="mods"><span class="mchip" style="--c:var(--m7)">M7</span></div></div>
+    </div>
+    <p class="loop-note"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>It is a loop. If the model is weak in step 5, you go back to step 2 or 3 and improve the data.</p>
+
+    <div class="kinds">
+      <div class="kind reveal">
+        <svg viewBox="0 0 240 130" role="img" aria-label="Labelled points split by a line">
+          <line x1="20" y1="118" x2="220" y2="12" stroke="var(--ink)" stroke-width="2" stroke-dasharray="5 5"><animate attributeName="x2" values="160;220;200;220" dur="5s" repeatCount="indefinite"/></line>
+          <g fill="var(--accent)"><circle cx="40" cy="40" r="7"/><circle cx="70" cy="25" r="7"/><circle cx="60" cy="62" r="7"/><circle cx="100" cy="30" r="7"/><circle cx="35" cy="80" r="7"/></g>
+          <g fill="var(--signal)"><circle cx="160" cy="100" r="7"/><circle cx="190" cy="80" r="7"/><circle cx="140" cy="115" r="7"/><circle cx="200" cy="110" r="7"/><circle cx="170" cy="70" r="7"/></g>
+        </svg>
+        <h3>Supervised learning</h3>
+        <p>You give examples <b>with answers</b> (this loan was paid, this one was not). The model learns to give the answer for new cases. Module 3.</p>
+      </div>
+      <div class="kind reveal">
+        <svg viewBox="0 0 240 130" role="img" aria-label="Unlabelled points forming three groups">
+          <g fill="var(--m1)"><circle cx="50" cy="40" r="6"><animate attributeName="cx" values="110;50;50" dur="4s" repeatCount="indefinite"/></circle><circle cx="65" cy="30" r="6"/><circle cx="40" cy="55" r="6"/><circle cx="62" cy="52" r="6"><animate attributeName="cy" values="100;52;52" dur="4s" repeatCount="indefinite"/></circle></g>
+          <g fill="var(--m4)"><circle cx="170" cy="35" r="6"/><circle cx="185" cy="50" r="6"><animate attributeName="cx" values="120;185;185" dur="4s" repeatCount="indefinite"/></circle><circle cx="160" cy="55" r="6"/><circle cx="190" cy="28" r="6"/></g>
+          <g fill="var(--m2)"><circle cx="115" cy="100" r="6"/><circle cx="100" cy="112" r="6"><animate attributeName="cy" values="40;112;112" dur="4s" repeatCount="indefinite"/></circle><circle cx="130" cy="112" r="6"/><circle cx="120" cy="88" r="6"/></g>
+        </svg>
+        <h3>Unsupervised learning</h3>
+        <p>You give data with <b>no answers</b>. The model finds groups on its own, like types of shoppers in a store. Module 4.</p>
+      </div>
+      <div class="kind reveal">
+        <svg viewBox="0 0 240 130" role="img" aria-label="A small neural network with three layers">
+          <g stroke="var(--rule)" stroke-width="1.5">
+            <line x1="40" y1="30" x2="120" y2="20"/><line x1="40" y1="30" x2="120" y2="65"/><line x1="40" y1="30" x2="120" y2="110"/>
+            <line x1="40" y1="65" x2="120" y2="20"/><line x1="40" y1="65" x2="120" y2="65"/><line x1="40" y1="65" x2="120" y2="110"/>
+            <line x1="40" y1="100" x2="120" y2="20"/><line x1="40" y1="100" x2="120" y2="65"/><line x1="40" y1="100" x2="120" y2="110"/>
+            <line x1="120" y1="20" x2="200" y2="45"/><line x1="120" y1="65" x2="200" y2="45"/><line x1="120" y1="110" x2="200" y2="45"/>
+            <line x1="120" y1="20" x2="200" y2="90"/><line x1="120" y1="65" x2="200" y2="90"/><line x1="120" y1="110" x2="200" y2="90"/>
+          </g>
+          <circle r="4" fill="var(--signal)"><animateMotion dur="2.4s" repeatCount="indefinite" path="M40 65 L120 20 L200 45"/></circle>
+          <circle r="4" fill="var(--signal)"><animateMotion dur="2.4s" begin="1.2s" repeatCount="indefinite" path="M40 100 L120 65 L200 90"/></circle>
+          <g fill="var(--panel)" stroke="var(--m5)" stroke-width="3"><circle cx="40" cy="30" r="9"/><circle cx="40" cy="65" r="9"/><circle cx="40" cy="100" r="9"/><circle cx="120" cy="20" r="9"/><circle cx="120" cy="65" r="9"/><circle cx="120" cy="110" r="9"/><circle cx="200" cy="45" r="9"/><circle cx="200" cy="90" r="9"/></g>
+        </svg>
+        <h3>Deep learning</h3>
+        <p>Layers of small “neurons” pass signals forward. Great for <b>images, text and sound</b>. Modules 5 and 6.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="route">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Part 2 · The course</div>
+      <h2>Seven stops to the capstone</h2>
+      <p class="lede">Each module is a station on one line. Tap a station to see what you learn, the labs you do, and the mini project you build there. Each stop adds one skill the capstone needs.</p>
+    </div>
+    <div class="route-scroll">
+      <div class="route" role="tablist" aria-label="Course modules" id="route-tabs">
+        <div class="track" aria-hidden="true"></div>
+      </div>
+    </div>
+    <div id="detail" role="tabpanel"></div>
+  </div>
+</section>
+
+<section id="capstone">
+  <div class="wrap">
+    <div class="cap-hero reveal">
+      <div class="sec-head" style="margin:0">
+        <div class="eyebrow">Part 3 · The terminus</div>
+        <h2>Capstone: Customer Churn Prediction Platform</h2>
+        <p class="lede">A telecom company loses money when customers leave (this is called <b>churn</b>). You will build a full system that predicts who is likely to leave, so the company can act early. It uses everything from Modules 1 to 7.</p>
+      </div>
+      <span class="badge">20 hours · telecom dataset (Kaggle)</span>
+    </div>
+
+    <div class="arch reveal">
+      <div class="eyebrow" style="margin:4px 4px 10px">What you will have at the end: one prediction, start to finish</div>
+      <div class="arch-scroll">
+        <svg viewBox="0 0 900 330" role="img" aria-label="Architecture: a user fills a form in the Streamlit dashboard, which calls the FastAPI /predict endpoint, which runs the best model loaded from the MLflow registry and returns a churn probability. Streamlit and FastAPI run in Docker on AWS EC2.">
+          <rect class="ec2" x="170" y="22" width="560" height="196" rx="16"/>
+          <text class="ec2t" x="188" y="44">DOCKER CONTAINERS · AWS EC2 (Render as backup)</text>
+          <path id="w1" class="wire" d="M120 120 H210"/>
+          <path id="w2" class="wire" d="M370 120 H440"/>
+          <path id="w3" class="wire" d="M600 120 H660"/>
+          <path class="wire dash" d="M750 168 V250 H600"/>
+          <!-- user -->
+          <rect class="box" x="16" y="72" width="104" height="96" rx="14"/>
+          <circle cx="68" cy="104" r="12" fill="none" stroke="var(--ink)" stroke-width="2"/>
+          <path d="M46 142c4-14 40-14 44 0" fill="none" stroke="var(--ink)" stroke-width="2"/>
+          <text class="lbl" x="68" y="190" text-anchor="middle">Manager</text>
+          <!-- streamlit -->
+          <rect class="box hot" x="210" y="72" width="160" height="96" rx="14"/>
+          <text class="lbl" x="290" y="108" text-anchor="middle">Streamlit</text>
+          <text class="sub" x="290" y="128" text-anchor="middle">dashboard + form</text>
+          <text class="sub" x="290" y="146" text-anchor="middle">input validation</text>
+          <!-- fastapi -->
+          <rect class="box hot" x="440" y="72" width="160" height="96" rx="14"/>
+          <text class="lbl" x="520" y="108" text-anchor="middle">FastAPI</text>
+          <text class="sub" x="520" y="128" text-anchor="middle">POST /predict</text>
+          <text class="sub" x="520" y="146" text-anchor="middle">error handling</text>
+          <!-- model -->
+          <rect class="box hot" x="660" y="72" width="180" height="96" rx="14" style="stroke:var(--signal)"/>
+          <text class="lbl" x="750" y="108" text-anchor="middle">Best model</text>
+          <text class="sub" x="750" y="128" text-anchor="middle">e.g. XGBoost</text>
+          <text class="sub" x="750" y="146" text-anchor="middle">churn probability</text>
+          <!-- mlflow -->
+          <rect class="box" x="440" y="222" width="160" height="70" rx="14"/>
+          <text class="lbl" x="520" y="252" text-anchor="middle">MLflow</text>
+          <text class="sub" x="520" y="272" text-anchor="middle">experiments + registry</text>
+          <text class="sub" x="612" y="242">loads model v3</text>
+          <!-- notebook -->
+          <rect class="box" x="210" y="222" width="160" height="70" rx="14"/>
+          <text class="lbl" x="290" y="252" text-anchor="middle">Training notebook</text>
+          <text class="sub" x="290" y="272" text-anchor="middle">EDA → 5 models</text>
+          <path class="wire dash" d="M370 257 H440"/>
+          <text class="sub" x="374" y="248">logs runs</text>
+          <!-- packets -->
+          <circle class="pkt" r="7"><animateMotion dur="3.6s" repeatCount="indefinite" keyPoints="0;1;1" keyTimes="0;0.46;1" calcMode="linear" path="M120 112 H660"/><animate attributeName="opacity" dur="3.6s" repeatCount="indefinite" values="1;1;0;0" keyTimes="0;0.46;0.5;1"/></circle>
+          <circle class="pkt2" r="7"><animateMotion dur="3.6s" repeatCount="indefinite" keyPoints="0;0;1" keyTimes="0;0.5;1" calcMode="linear" path="M660 130 H120"/><animate attributeName="opacity" dur="3.6s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.49;0.5;0.97;1"/></circle>
+        </svg>
+      </div>
+      <div class="arch-key"><span><i style="background:var(--signal)"></i>customer details go in</span><span><i style="background:var(--accent)"></i>“72% likely to leave” comes back</span><span>Dashed lines happen during training, not on each request.</span></div>
+    </div>
+
+    <div class="phases" id="phases"></div>
+
+    <div class="sec-head reveal" style="margin-top:20px">
+      <h3>The five models you will compare</h3>
+      <p class="note" style="font-size:15px">You train all five on the same data, compare their scores, and pick one with a clear reason.</p>
+    </div>
+    <div class="models">
+      <div class="model reveal"><b>Logistic Regression</b><span>Simple and easy to explain. A good first baseline.</span></div>
+      <div class="model reveal"><b>Random Forest</b><span>Many decision trees vote. Strong and stable.</span></div>
+      <div class="model reveal"><b>XGBoost</b><span>Trees built one after another, each fixing earlier mistakes.</span></div>
+      <div class="model reveal"><b>LightGBM</b><span>Like XGBoost, but faster on big data.</span></div>
+      <div class="model reveal"><b>SVM</b><span>Finds the widest gap between “stay” and “leave”.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="try">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Part 4 · Try it yourself</div>
+      <h2>See the capstone app in action</h2>
+      <p class="lede">This is a small practice version of the Streamlit form you will build. Change the customer details and watch the request and the answer change. The numbers come from a simple practice formula, not a trained model.</p>
+    </div>
+    <div class="lab">
+      <div class="card">
+        <h3>Customer details</h3>
+        <div class="field"><label for="tenure">Months with the company <output id="tenure-o">6</output></label><input type="range" id="tenure" min="0" max="72" value="6"></div>
+        <div class="field"><label for="charge">Monthly bill ($) <output id="charge-o">85</output></label><input type="range" id="charge" min="18" max="120" value="85"></div>
+        <div class="field"><span style="font-weight:700;font-size:15px">Contract type</span>
+          <div class="seg" id="contract" role="group" aria-label="Contract type">
+            <button type="button" data-v="Month-to-month" aria-pressed="true">Month-to-month</button>
+            <button type="button" data-v="One year" aria-pressed="false">One year</button>
+            <button type="button" data-v="Two year" aria-pressed="false">Two year</button>
+          </div>
+        </div>
+        <div class="field"><span style="font-weight:700;font-size:15px">Has tech support</span>
+          <div class="seg" id="support" role="group" aria-label="Has tech support">
+            <button type="button" data-v="No" aria-pressed="true">No</button>
+            <button type="button" data-v="Yes" aria-pressed="false">Yes</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="gauge">
+          <span class="eyebrow">Chance this customer leaves</span>
+          <div class="big" id="prob">0%</div>
+          <div class="meter"><i id="needle" style="left:50%"></i></div>
+          <div><span class="pill" id="risk">High risk</span></div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:6px">What Streamlit sends to FastAPI</div>
+          <pre class="json" id="req"></pre>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:6px">What FastAPI sends back</div>
+          <pre class="json" id="res"></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-head reveal" style="margin-top:56px">
+      <h3>How do we know the model is good?</h3>
+      <p class="lede" style="font-size:16px">Below are 100 practice test customers. The model gives each one a score. If the score is above the <b>threshold</b>, we say “will leave”. Move the slider and see how the scores in Module 3 change.</p>
+    </div>
+    <div class="cm-wrap">
+      <div class="card">
+        <div class="field"><label for="thr">Threshold <output id="thr-o">0.50</output></label><input type="range" id="thr" min="0.05" max="0.95" step="0.05" value="0.5"></div>
+        <div class="dots" id="dots" aria-hidden="true"></div>
+        <div class="legend">
+          <span><i style="background:var(--danger)"></i>Caught: left, we said leave</span>
+          <span><i style="border-color:var(--danger)"></i>Missed: left, we said stay</span>
+          <span><i style="background:var(--signal)"></i>False alarm: stayed, we said leave</span>
+          <span><i style="background:var(--soft);border-color:var(--rule)"></i>Correct: stayed, we said stay</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="cm" id="cm"></div>
+        <div class="metrics" id="metrics"></div>
+        <p class="note">Practice data made up for learning. In the capstone you will see these same scores for your real models, plus ROC-AUC.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="finish">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">Part 5 · Finish line</div>
+      <h2>What you hand in</h2>
+      <p class="lede">Tick each item as you finish it. Your ticks are saved in this browser only.</p>
+    </div>
+    <div class="progress"><div class="bar"><i id="pbar" style="width:0%"></i></div><span id="ptext">0 of 6 done</span></div>
+    <div class="deliv" id="deliv"></div>
+
+    <div class="sec-head reveal" style="margin-top:56px">
+      <h3>Your toolbox, module by module</h3>
+    </div>
+    <div class="stack" id="stack"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Built from the MPGI Data Science &amp; Machine Learning Master Curriculum: 7 modules, 6 mini projects and one capstone.</div>
+</footer>
+
+<script>
+(function(){
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+/* ---------- hero canvas ---------- */
+const cv = document.getElementById('flow'), ctx = cv.getContext('2d');
+let W=0,H=0,parts=[],colors={};
+function readColors(){colors={ink:css('--ink'),muted:css('--muted'),a:css('--accent'),b:css('--signal'),rule:css('--rule'),panel:css('--panel'),paper:css('--paper')};}
+function size(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0);}
+function spawn(x){const cls=Math.random()<.35?1:0;return{x:x??-10-Math.random()*40,y:20+Math.random()*(H-40),cls,sp:.6+Math.random()*.7,r:3+Math.random()*2.5,ty:0}}
+function init(){parts=[];for(let i=0;i<70;i++)parts.push(spawn(Math.random()*W));}
+function draw(step){
+  ctx.clearRect(0,0,W,H);
+  const mx=W/2, bw=Math.min(110,W*.24), bh=H*.56;
+  const laneA=H*.28, laneB=H*.72;
+  // lanes
+  ctx.strokeStyle=colors.rule;ctx.setLineDash([4,6]);ctx.lineWidth=1;
+  [laneA,laneB].forEach(y=>{ctx.beginPath();ctx.moveTo(mx+bw/2+8,y);ctx.lineTo(W-8,y);ctx.stroke();});
+  ctx.setLineDash([]);
+  ctx.font='600 11px "JetBrains Mono", monospace';ctx.textAlign='right';
+  ctx.fillStyle=colors.b;ctx.fillText('WILL LEAVE',W-10,laneA-14);
+  ctx.fillStyle=colors.a;ctx.fillText('WILL STAY',W-10,laneB+22);
+  for(const p of parts){
+    if(step){p.x+=p.sp*1.6;
+      if(p.x>mx-bw/2){const target=p.cls?laneA:laneB;p.y+=(target+(p.ty||(p.ty=(Math.random()-.5)*26))-p.y)*.06;}
+      else p.y+=Math.sin((p.x+p.r*40)/30)*.35;
+      if(p.x>W+10)Object.assign(p,spawn());}
+    const past=p.x>mx;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);
+    ctx.fillStyle=past?(p.cls?colors.b:colors.a):colors.muted;
+    ctx.globalAlpha=past?1:.55;ctx.fill();ctx.globalAlpha=1;
+  }
+  // model box
+  const x=mx-bw/2,y=(H-bh)/2;
+  ctx.fillStyle=colors.panel;ctx.strokeStyle=colors.ink;ctx.lineWidth=2;
+  ctx.beginPath();ctx.roundRect(x,y,bw,bh,14);ctx.fill();ctx.stroke();
+  // gears of layers
+  const t=performance.now()/600;
+  for(let c=0;c<3;c++)for(let r=0;r<4;r++){
+    const cx=x+bw*(.25+c*.25), cy=y+bh*(.2+r*.2);
+    const on=reduce?0:(Math.sin(t+c*1.3+r*.7)+1)/2;
+    ctx.beginPath();ctx.arc(cx,cy,5,0,7);
+    ctx.fillStyle=on>.6?colors.a:colors.rule;ctx.fill();
+  }
+}
+function loop(){draw(true);requestAnimationFrame(loop);}
+function start(){size();readColors();init();if(reduce){for(let i=0;i<200;i++)draw(true);draw(false);}else loop();}
+new ResizeObserver(()=>{size();if(reduce)draw(false);}).observe(cv);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{readColors();if(reduce)draw(false);});
+new MutationObserver(()=>{readColors();if(reduce)draw(false);}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+start();
+if(reduce)document.querySelectorAll('animate,animateMotion').forEach(a=>a.remove());
+
+/* ---------- modules ---------- */
+const M=[
+ {n:1,c:'--m1',h:5,t:'Python for Data Science',short:'Python basics',
+  simple:'Learn the tools. Python is the language, Pandas is like Excel inside code, and Matplotlib and Seaborn draw the charts.',
+  why:'Every later module starts here: load data with Pandas, clean it, and look at it with charts.',
+  topics:[['NumPy arrays','Fast lists of numbers. Do maths on a whole column in one line.'],['Pandas DataFrames','Tables in code. Filter, groupby, merge and pivot.'],['Matplotlib & Seaborn','Draw charts to see patterns (EDA).'],['File I/O','Read and save CSV, JSON and Excel files.'],['List comprehensions, lambda, map/filter','Short ways to write loops.'],['Virtual environments & Jupyter','A clean setup and a notebook to work in.']],
+  labs:['EDA on IPL / Zomato dataset','Data cleaning pipeline lab','Visualisation challenge (5 chart types)','Pandas groupby analysis assignment'],
+  mini:"Exploratory Data Analysis on India's COVID-19 dataset: find state-wise trends, recovery rates and vaccination progress with 10+ charts and a written summary report.",
+  tools:['Python','NumPy','Pandas','Matplotlib','Seaborn','Jupyter']},
+ {n:2,c:'--m2',h:14,t:'Statistics & Probability for ML',short:'Statistics',
+  simple:'Learn to trust numbers. Statistics tells you if a difference is real or just luck.',
+  why:'In the capstone you use correlation to choose features and testing to back up your results.',
+  topics:[['Descriptive statistics','Mean, median and variance. Describe data with a few numbers.'],['Probability distributions','Normal, binomial, Poisson. Common shapes that data takes.'],['Hypothesis testing','t-test, chi-square, ANOVA. Is a difference real or random?'],['Correlation vs causation','Two things moving together does not mean one causes the other.'],['Central limit theorem & sampling','Why averages of samples behave in a predictable way.'],["Bayes' theorem basics",'Update what you believe when new evidence arrives.']],
+  labs:['Hypothesis testing on sales data','Distribution fitting with scipy','A/B test simulation lab','Correlation matrix heatmap project'],
+  mini:'A/B test analysis for an e-commerce website: compare two pricing strategies with hypothesis testing, calculate p-values, and recommend the better one with statistical confidence.',
+  tools:['Python','scipy','statsmodels','seaborn']},
+ {n:3,c:'--m3',h:16,t:'Supervised Learning',short:'Supervised',
+  simple:'Teach a computer with answered examples. It learns to predict a number (a price) or a label (yes or no).',
+  why:'This is the heart of the capstone. Churn is a yes/no question, so you use the classifiers from here.',
+  topics:[['Linear & logistic regression','A best-fit line. Predict a number, or the chance of yes/no.'],['Decision trees & random forests','A chain of yes/no questions. Many trees vote together.'],['Support vector machines (SVM)','Find the widest gap between two groups.'],['K-nearest neighbours (KNN)','Look at the closest past examples and copy their answer.'],['Gradient boosting: XGBoost, LightGBM','Many small trees, each one fixing the last one\'s mistakes.'],['Model evaluation','Accuracy, F1 and ROC-AUC tell you how good the model is.'],['Cross-validation & tuning','Test fairly, and search for the best settings.']],
+  labs:['House price prediction with linear regression','Titanic survival classification','Feature importance with random forests','GridSearchCV tuning lab'],
+  mini:'Loan default prediction system: build, compare and evaluate 4 classifiers (LR, RF, XGBoost, SVM) on a banking dataset, pick the best one, and explain it with feature importance plots.',
+  tools:['scikit-learn','XGBoost','LightGBM','GridSearchCV','Matplotlib']},
+ {n:4,c:'--m4',h:16,t:'Unsupervised Learning & Feature Engineering',short:'Unsupervised + features',
+  simple:'Find groups in data when there are no answers, and turn raw columns into better inputs for a model.',
+  why:'Good features often matter more than the choice of model. You will create new features for the churn data.',
+  topics:[['K-means & hierarchical clustering','Put similar rows into the same group.'],['DBSCAN','Find groups by how crowded points are. Flag lonely points.'],['PCA','Squeeze many columns into a few while keeping most of the information.'],['Feature scaling','Put columns on the same scale (StandardScaler, MinMax).'],['Encoding','Turn words like "Delhi" into numbers (one-hot, label, target).'],['Missing values & outliers','Fill gaps and handle extreme values.'],['Feature selection','Keep the columns that help, drop the noise.']],
+  labs:['Customer segmentation with K-means','PCA on image data (MNIST)','Feature engineering on Kaggle dataset','Outlier detection lab'],
+  mini:'Customer segmentation for a retail brand: use K-means on RFM (Recency, Frequency, Monetary) features to find 4-5 customer groups and write a targeting strategy report.',
+  tools:['scikit-learn','KMeans','DBSCAN','PCA','Pandas']},
+ {n:5,c:'--m5',h:15,t:'Deep Learning & Neural Networks',short:'Deep learning',
+  simple:'Build neural networks: layers of small units that learn step by step. They are very good with images.',
+  why:'You learn to save and load a trained model and put a simple web app around it. Same idea as the capstone, on a smaller scale.',
+  topics:[['Perceptron, activations, backpropagation','One tiny neuron, and how a network learns from its errors.'],['ANNs with Keras / TensorFlow','Stack layers of neurons in a few lines of code.'],['Convolutional networks (CNN)','Networks that look at images in small patches.'],['Recurrent networks: LSTM, GRU','Networks that remember order, for text and sequences.'],['Transfer learning: VGG16, ResNet','Start from a model already trained on millions of images.'],['Dropout, batch norm, regularisation','Stop the network from just memorising the training data.'],['Saving, loading & deployment basics','Keep a trained model and use it later in an app.']],
+  labs:['MNIST handwritten digit classifier','Image classification with CNN','Sentiment analysis with LSTM','Transfer learning fine-tuning lab'],
+  mini:'Plant disease detection system: train a CNN with transfer learning (ResNet) on leaf images to classify 10 disease types with 90%+ accuracy, inside a simple Gradio web interface.',
+  tools:['TensorFlow','Keras','ResNet','VGG16','LSTM','Gradio']},
+ {n:6,c:'--m6',h:14,t:'NLP & Time Series',short:'NLP + time series',
+  simple:'Work with two special kinds of data: text (reviews, news) and data over time (daily sales, stock prices).',
+  why:'Real businesses mix text and time data. This shows you how to turn both into numbers a model can use.',
+  topics:[['Text preprocessing','Tokenise, stem and TF-IDF. Turn text into numbers.'],['Bag of words vs Word2Vec','Count words, or learn what words mean.'],['Sentiment & text classification','Is this review happy or angry?'],['Named entity recognition (spaCy)','Pick out names, places and brands from text.'],['Time series decomposition','Split a series into trend, season and noise.'],['ARIMA, SARIMA','Classic models to forecast the next values.'],['FB Prophet','Easy business forecasting with holidays and seasons.']],
+  labs:['Amazon review sentiment classifier','Stock price ARIMA forecasting','News topic modelling with LDA','Prophet sales forecast lab'],
+  mini:'E-commerce review intelligence system: sort reviews by sentiment, pull out key product complaints with NER, and forecast weekly sales with ARIMA, all in one notebook report.',
+  tools:['spaCy','NLTK','Word2Vec','ARIMA','FB Prophet','scikit-learn']},
+ {n:7,c:'--m7',h:20,t:'ML Deployment & Capstone',short:'Deploy + capstone',end:true,
+  simple:'Put your model on the internet. Wrap it in an API, give it a dashboard, pack it in Docker, and run it on a cloud server.',
+  why:'A model in a notebook helps nobody. A model behind a live URL can be used by a whole company, and it shows employers what you can do.',
+  topics:[['REST API with Flask / FastAPI','Give your model a web address other apps can call.'],['Streamlit dashboards','Build a simple web page with forms and charts in Python.'],['Docker basics','Pack the app so it runs the same on any computer.'],['Deploy to Heroku / Render / AWS EC2','Put the app on a server on the internet.'],['MLflow experiment tracking','Record every run: settings, scores and model files.'],['Model versioning & monitoring','Keep track of model versions and watch them after launch.']],
+  labs:['Wrap a model in a FastAPI endpoint','Build a Streamlit UI for predictions','Dockerise and deploy on Render','MLflow tracking experiment lab'],
+  mini:'Capstone (20 hrs): Customer Churn Prediction Platform. EDA → feature engineering → train and compare 5 models → best model in FastAPI → Streamlit dashboard with live form → Docker on AWS EC2 → MLflow logs. Plus a 5-page report, GitHub README and live demo URL.',
+  tools:['FastAPI','Streamlit','Docker','AWS EC2','MLflow','scikit-learn','Render']}
+];
+const maxH=Math.max(...M.map(m=>m.h));
+const tabs=document.getElementById('route-tabs'), detail=document.getElementById('detail');
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+M.forEach((m,i)=>{
+  const b=document.createElement('button');
+  b.className='stop'+(m.end?' end':'');b.type='button';b.role='tab';b.id='tab-m'+m.n;
+  b.style.setProperty('--c','var('+m.c+')');
+  b.innerHTML=`<span class="ring">${m.end?'M7':m.n}</span><span class="t">${esc(m.short)}</span><span class="h">${m.h} hrs</span>`;
+  b.addEventListener('click',()=>select(i,true));
+  b.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const j=(i+(e.key==='ArrowRight'?1:-1)+M.length)%M.length;select(j,true);tabs.querySelectorAll('.stop')[j].focus();}});
+  tabs.appendChild(b);
+});
+function select(i,user){
+  const m=M[i];
+  tabs.querySelectorAll('.stop').forEach((b,j)=>{b.setAttribute('aria-selected',j===i);b.tabIndex=j===i?0:-1;});
+  detail.setAttribute('aria-labelledby','tab-m'+m.n);
+  detail.innerHTML=`<div class="detail" style="--c:var(${m.c})">
+    <div>
+      <div class="eyebrow">Module ${m.n}</div>
+      <h3 style="font-size:28px;margin-top:-8px">${esc(m.t)}</h3>
+      <p class="simple">${esc(m.simple)}</p>
+      <div><h4>What you learn</h4><ul class="topics">${m.topics.map(t=>`<li><b>${esc(t[0])}</b><span>${esc(t[1])}</span></li>`).join('')}</ul></div>
+    </div>
+    <div>
+      <div class="hours"><h4 style="margin:0">Time</h4><div class="bar"><i style="width:${m.h/maxH*100}%"></i></div><small>${m.h} hours</small></div>
+      <div><h4>Hands-on labs</h4><ul class="labs">${m.labs.map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>
+      <div class="mini"><span class="tag">${m.end?'Capstone':'Mini project'}</span><p>${esc(m.mini)}</p></div>
+      <p class="why"><b style="color:var(--ink)">Why it matters:</b> ${esc(m.why)}</p>
+      <div><h4>Tools</h4><div class="chips">${m.tools.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div></div>
+      ${m.end?'<a href="#capstone" style="font-weight:700">See the capstone step by step ↓</a>':''}
+    </div></div>`;
+  try{if(user)localStorage.setItem('dsml-mod',i)}catch(e){}
+}
+let startMod=0;try{const s=+localStorage.getItem('dsml-mod');if(s>=0&&s<7)startMod=s}catch(e){}
+select(startMod,false);
+
+/* ---------- capstone phases ---------- */
+const P=[
+ {t:'Data pipeline & EDA',s:'Get to know the data and make it ready for modelling.',
+  items:['Load the telecom customer churn dataset (Kaggle)','Exploratory Data Analysis with 10+ charts','Clean the data: missing values, outliers, duplicates','Feature engineering: create new useful columns','Correlation analysis and feature selection','Train/test split and a cross-validation plan'],
+  out:'A clean dataset, 10+ charts, and a fair way to test models.',uses:[1,2,4]},
+ {t:'Model training & evaluation',s:'Train several models, compare them fairly, and pick the winner.',
+  items:['Train and compare 5 classifiers: Logistic Regression, Random Forest, XGBoost, LightGBM, SVM','Tune settings with GridSearchCV or Optuna','Evaluate with Accuracy, F1, ROC-AUC and the confusion matrix','Choose the best model and explain why','SHAP / feature importance plots to explain predictions'],
+  out:'One chosen model with scores and a clear reason, plus plots that show why it predicts what it does.',uses:[3,4]},
+ {t:'Deployment with FastAPI + Streamlit',s:'Turn the model into a real app that anyone can use.',
+  items:['Wrap the best model in a FastAPI REST endpoint (/predict)','Streamlit dashboard with a live prediction form','Input validation and error handling','Dockerise the app (Dockerfile + docker-compose)','Deploy on AWS EC2 (Render as a backup)','MLflow experiment tracking and model registry'],
+  out:'A live app at a public URL, running in Docker, with every model version recorded in MLflow.',uses:[5,7]},
+ {t:'Deliverables & documentation',s:'Package your work so others can check it, run it, and hire you for it.',
+  items:['5-page project report (PDF): problem, EDA, method, results, conclusion','GitHub repository with a clear README','Live demo URL for your portfolio','MLflow experiment logs and model versions','All 6 mini projects on GitHub with READMEs','A notebook that runs the full pipeline again from start'],
+  out:'A complete portfolio piece: report, code, live demo and logs.',uses:[1,2,3,4,5,6,7]}
+];
+document.getElementById('phases').innerHTML=P.map((p,i)=>`
+ <div class="phase reveal"><div class="num">${i+1}</div>
+  <div class="body">
+   <div><h3>${esc(p.t)}</h3><p class="s">${esc(p.s)}</p><ul>${p.items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+   <div><div class="out"><b>You will have</b>${esc(p.out)}</div>
+    <div class="uses">Uses skills from ${p.uses.map(n=>`<span class="mchip" style="--c:var(--m${n})">M${n}</span>`).join('')}</div></div>
+  </div></div>`).join('');
+
+/* ---------- churn toy ---------- */
+const st={tenure:6,charge:85,contract:'Month-to-month',support:'No'};
+const $=id=>document.getElementById(id);
+function seg(id,key){$(id).querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{st[key]=b.dataset.v;$(id).querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));calc();}));}
+seg('contract','contract');seg('support','support');
+['tenure','charge'].forEach(k=>$(k).addEventListener('input',e=>{st[k]=+e.target.value;$(k+'-o').textContent=st[k];calc();}));
+function calc(){
+  const c={'Month-to-month':1.1,'One year':-0.5,'Two year':-1.7}[st.contract];
+  const z=0.2-0.05*st.tenure+0.025*(st.charge-65)+c-(st.support==='Yes'?0.7:0);
+  const p=1/(1+Math.exp(-z)), pct=Math.round(p*100);
+  $('prob').textContent=pct+'%';$('needle').style.left=pct+'%';
+  const r=$('risk'), lvl=p>=.6?['High risk','--danger']:p>=.35?['Medium risk','--signal']:['Low risk','--accent'];
+  r.textContent=lvl[0];r.style.background='var('+lvl[1]+')';
+  $('req').innerHTML=`<span class="c">POST /predict</span>\n{\n  <span class="k">"tenure"</span>: <span class="v">${st.tenure}</span>,\n  <span class="k">"monthly_charges"</span>: <span class="v">${st.charge}</span>,\n  <span class="k">"contract"</span>: <span class="v">"${st.contract}"</span>,\n  <span class="k">"tech_support"</span>: <span class="v">"${st.support}"</span>\n}`;
+  $('res').innerHTML=`{\n  <span class="k">"churn_probability"</span>: <span class="v">${p.toFixed(2)}</span>,\n  <span class="k">"prediction"</span>: <span class="v">"${p>=.5?'Will leave':'Will stay'}"</span>,\n  <span class="k">"model_version"</span>: <span class="v">"v3"</span>\n}`;
+}
+calc();
+
+/* ---------- confusion matrix ---------- */
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646};
+const gauss=()=>{let u=0;for(let i=0;i<6;i++)u+=rnd();return(u-3)/1.2};
+const custs=[];for(let i=0;i<100;i++){const churn=i<27;const s=Math.min(.99,Math.max(.01,(churn?.64:.32)+gauss()*.17));custs.push({churn,s});}
+custs.sort((a,b)=>rnd()-.5);
+const dots=$('dots');dots.innerHTML=custs.map(()=>'<i></i>').join('');
+function cm(){
+  const t=+$('thr').value;$('thr-o').textContent=t.toFixed(2);
+  let tp=0,fp=0,fn=0,tn=0;
+  custs.forEach((c,i)=>{const pred=c.s>=t;const k=c.churn?(pred?'tp':'fn'):(pred?'fp':'tn');({tp:()=>tp++,fp:()=>fp++,fn:()=>fn++,tn:()=>tn++})[k]();dots.children[i].className=k;});
+  $('cm').innerHTML=`<div class="hd"></div><div class="hd">We said: leave</div><div class="hd">We said: stay</div>
+   <div class="hd" style="align-self:center">Really left</div><div><b style="color:var(--danger)">${tp}</b>caught</div><div><b>${fn}</b>missed</div>
+   <div class="hd" style="align-self:center">Really stayed</div><div><b style="color:var(--signal)">${fp}</b>false alarm</div><div><b>${tn}</b>correct</div>`;
+  const acc=(tp+tn)/100, prec=tp+fp?tp/(tp+fp):0, rec=tp+fn?tp/(tp+fn):0, f1=prec+rec?2*prec*rec/(prec+rec):0;
+  const f=x=>Math.round(x*100)+'%';
+  $('metrics').innerHTML=`
+   <div class="metric"><em>ACCURACY</em><b>${f(acc)}</b><span>How many we got right overall.</span></div>
+   <div class="metric"><em>PRECISION</em><b>${f(prec)}</b><span>When we said “leave”, how often we were right.</span></div>
+   <div class="metric"><em>RECALL</em><b>${f(rec)}</b><span>Of the people who really left, how many we caught.</span></div>
+   <div class="metric"><em>F1 SCORE</em><b>${f(f1)}</b><span>One score that balances precision and recall.</span></div>`;
+}
+$('thr').addEventListener('input',cm);cm();
+
+/* ---------- deliverables ---------- */
+const D=[['5-page project report (PDF)','Problem, EDA, method, results, conclusion.'],['GitHub repository + README','Clear structure and setup steps.'],['Live demo URL','Your Streamlit app running on AWS EC2 or Render.'],['MLflow logs & model versions','Every experiment and the registered best model.'],['All 6 mini projects on GitHub','Each with its own README.'],['End-to-end notebook','Runs the full pipeline again from the raw data.']];
+let done={};try{done=JSON.parse(localStorage.getItem('dsml-done')||'{}')}catch(e){}
+$('deliv').innerHTML=D.map((d,i)=>`<label for="d${i}"><input type="checkbox" id="d${i}" ${done[i]?'checked':''}><span><span class="dt">${esc(d[0])}</span><span class="dd">${esc(d[1])}</span></span></label>`).join('');
+function prog(){const n=D.filter((_,i)=>$('d'+i).checked).length;$('pbar').style.width=(n/D.length*100)+'%';$('ptext').textContent=`${n} of ${D.length} done`;}
+D.forEach((_,i)=>$('d'+i).addEventListener('change',e=>{done[i]=e.target.checked;try{localStorage.setItem('dsml-done',JSON.stringify(done))}catch(err){}prog();}));
+prog();
+
+/* ---------- stack ---------- */
+$('stack').innerHTML=M.map(m=>`<div class="srow reveal" style="--c:var(${m.c})"><div class="who"><i></i>M${m.n} · ${esc(m.short)}</div><div class="chips">${m.tools.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div></div>`).join('');
+})();
+</script>
+
+</body></html>
